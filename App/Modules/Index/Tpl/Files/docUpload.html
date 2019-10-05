@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<css file="__PUBLIC__/bootstrap3/css/bootstrap.min.css"/>
+	<js file="__PUBLIC__/lib/jquery-1.8.1.min.js"/>
+	<js file="__PUBLIC__/bootstrap3/js/bootstrap.min.js"/>
+	<js file="__PUBLIC__/lib/jquery.form.js"/>
+	<!--弹出对话框-->
+	<link rel="stylesheet" href="__PUBLIC__/artDialog/css/ui-dialog.css">
+	<script src="__PUBLIC__/artDialog/dist/dialog-min.js"></script>
+	<title>docUpload</title>
+</head>
+<body>
+<div class="panel panel-primary">
+	<div class="panel-heading" id="title"><font style="font-size:22px;">
+		{$task['title']}</font><if condition="$task_ok"><font style="color:red;">你已完成本任务</font></if>
+	</div>
+	<div class="panel-body">
+		{$task['content']}
+	</div>
+</div>
+<form id="files" method="post" action="{:U('Index/Files/docSave')}" enctype="multipart/form-data">
+	<input type="hidden" name="task_id" value="{$task['id']}" />
+	<input id="select" <if condition="$task_ok">disabled='disabled'</if> multiple="multiple" type="file"  name="files[]"/>
+	<input id="upload" <if condition="$task_ok">disabled='disabled'</if> type="submit" value="上传" />
+</form>
+<if condition="$task_ok"><button id="re">重新上传</button></if>
+<a id="postCheck" href="" class="btn btn-primary" type="button">提交审核</a>
+<script>
+    $(document).ready(function(){
+        $("#re").click(function(){
+            var d = dialog({
+                title: '提示',
+                content: '确定要重新上传？？',
+                okValue: '确定',
+                ok: function () {
+                    $("#select").removeAttr("disabled");
+                    $("#upload").removeAttr("disabled");
+                    $("#re").remove();
+                    return;
+                },
+                cancelValue: '取消',
+                cancel: function () {}
+            });
+            d.show();
+
+        });
+        $("#reupload").live("click",function(event){
+            $("#select").removeAttr("disabled");
+            $("#upload").removeAttr("disabled");
+            $(this).remove();
+        });
+
+        $("#files").submit(function(){
+            var options = {
+                target : '#output1',
+                dataType : 'json',
+                beforeSubmit : function(formData, jqForm, options){
+                    for (var i=0; i < formData.length; i++) {
+                        if (!formData[i].value) return false;
+                    }
+                },
+                success:function(data){
+                    if(data){
+                        var d = dialog({
+                            content: '恭喜，上传成功咯,任务完成;-)'
+                        });
+                        d.show();
+                        setTimeout(function () {
+                            d.close().remove();
+                        }, 2000);
+                        //设置上传为不可用
+                        $("#select").attr("disabled","disabled");
+                        $("#upload").attr("disabled","disabled");
+                        $("#files").after("<button id='reupload'>重新上传</button>");
+
+                    }
+                    else {
+                        var d = dialog({
+                            content: '哎呀，上传失败啦-_-!'
+                        });
+                        d.show();
+                        setTimeout(function () {
+                            d.close().remove();
+                        }, 2000);
+                    }
+
+                }
+            }
+            $(this).ajaxSubmit(options);
+            return false; //阻止表单默认提交
+        });
+
+    });
+</script>
+</body>
+</html>

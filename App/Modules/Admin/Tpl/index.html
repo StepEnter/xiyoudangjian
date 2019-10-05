@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<script type="text/javascript" src="index.js"></script>
+<title>全国城市三级联动</title>
+
+</head>
+<body>
+ <select id="s_province" name="s_province"></select>&nbsp;&nbsp;
+ <select id="s_city" name="s_city" ></select>&nbsp;&nbsp;
+ <select id="s_county" name="s_county"></select>
+ <script type="text/javascript">_init_area();</script>
+<script type="text/javascript">
+var Gid  = document.getElementById ;
+var showArea = function(){
+ Gid('show').innerHTML = "<h3>" + Gid('s_province').value + " - " +
+       Gid('s_city').value + " - " +
+       Gid('s_county').value + "</h3>"
+}
+Gid('s_county').setAttribute('onchange','showArea()');
+</script>
+</body>
+</html>

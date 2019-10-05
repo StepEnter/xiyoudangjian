@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>node</title>
+    <!--jquery资源引入-->
+  <js href="__PUBLIC__/lib/jquery-1.8.1.min.js"/>
+  <!--bootstrap3资源引入-->
+  <css href="__PUBLIC__/bootstrap3/css/bootstrap.min.css"/>
+  <js href="__PUBLIC__/bootstrap3/js/bootstrap.min.js"/>
+   <!--弹出对话框-->
+    <link rel="stylesheet" href="__PUBLIC__/artDialog/css/ui-dialog.css">
+    <script src="__PUBLIC__/artDialog/dist/dialog-plus.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/lib/jquery.form.js"></script>
+    <script type="text/javascript">
+     $(function(){
+     	$('input[level=1]').click(function(){
+     		var inputs = $(this).parents('.app').find('input');
+     		$(this).attr('checked') ? inputs.attr('checked','checked') :
+     		   inputs.removeAttr('checked');
+     	});
+
+     	$('input[level=2]').click(function(){
+     		var inputs = $(this).parents('dl').find('input');
+     		$(this).attr('checked')? inputs.attr('checked','checked') :
+     		   inputs.removeAttr('checked');
+     	});
+
+     });
+    </script>
+</head>
+<body>
+	<div id="wrap">
+		<form id="manage" action="{:U('Admin/Rbac/setManage')}" method="post">
+		<foreach name='node' item='app'>
+			<div class="app panel panel-primary">
+			  <div class="panel-heading" >
+				{$app.name}
+					<input type="checkbox" name="access[]" value="{$app.id}_1"  level='1' <if condition='$app["access"]'>checked='checked'</if> />
+			  </div>
+			<foreach name="app['child']" item='action'>
+				<dl class="panel panel-success" style="margin-left:10px;margin-right:10px;">
+					<dt class="panel-heading">
+					<strong>{$action.name}</strong>
+					<input type="checkbox" name="access[]" value="{$action.id}_2"  level='2' <if condition='$action["access"]'>checked='checked'</if> />
+					</dt>
+					
+						<foreach name="action['child']" item='method' >
+						<dd class="panel panel-warning" style="margin-left:10px;margin-right:10px;">
+						
+						    {$method.name}
+						    <input type="checkbox" name="access[]" value="{$method.id}_3"  level='3' <if condition='$method["access"]'>checked='checked'</if> />
+						
+						</dd>
+						</foreach>
+				</dl>
+			</foreach>
+		    </div>
+		</foreach>
+		<input type="hidden" name="rid" value="{$rid}" />
+     <input type="submit" value="保存修改"  style="display:block;margin:20px auto;" />
+	</div>
+	</form>
+
+	<script>
+    $(document).ready(function(){
+    $("#manage").submit(function(){
+                var options = {
+                    target : '#output1',
+                    dataType : 'json',
+                    success:function(data){
+                        if(data){
+                            var d = dialog({
+                                content: '恭喜，保存成功咯;-)'
+                            });
+                            d.show();
+                            setTimeout(function () {
+                                d.close().remove();
+                                parent.location.reload();
+                            }, 2000); 
+                            
+                        }
+                        else {
+                            var d = dialog({
+                                content: '哎呀，保存失败啦-_-!'
+                            });
+                            d.show();
+                            setTimeout(function () {
+                                d.close().remove();
+                            }, 2000);
+                        }
+                    }
+                }
+                $(this).ajaxSubmit(options);  
+               return false; //阻止表单默认提交  
+            });
+});
+</script>
+</body>
+</html>

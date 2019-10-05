@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/bui-bootstrap/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/bui-bootstrap/Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/bui-bootstrap/Css/style.css" />
+    <script type="text/javascript" src="__PUBLIC__/bui-bootstrap/Js/jquery.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/bui-bootstrap/Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/bui-bootstrap/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/bui-bootstrap/Js/ckform.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/bui-bootstrap/Js/common.js"></script> 
+    <!--弹出对话框-->
+    <link rel="stylesheet" href="__PUBLIC__/artDialog/css/ui-dialog.css">
+    <script src="__PUBLIC__/artDialog/dist/dialog-plus.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/lib/jquery.form.js"></script>
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+<form id="editNode" action="{:U('Admin/Rbac/editNodeHandle')}" method="post" class="definewidth m20">
+<input type="hidden" name="id" value="" />
+<table class="table table-bordered table-hover ">
+    <tr>
+        <th colspan="2">修改{$type}</th>
+    </tr>
+    <tr>
+        <td width="30%" class="tableleft">{$type}名称：</td>
+        <td><input type="text" name="name" value="{$node['name']}" /></td>
+    </tr>
+    <tr>
+        <td class="tableleft">{$type}标题：</td>
+        <td><input type="text" name="title" value="{$node['title']}"/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">排序</td>
+        <td><input type="text" name="sort" value="{$node['sort']}"/></td>
+    </tr> 
+    <tr>
+        <td class="tableleft">备注</td>
+        <td><input type="text" name="remark" value="{$node['remark']}"/></td>
+    </tr>    
+    <tr>
+        <td class="tableleft">状态</td>
+        <td>
+            <input type="radio" name="status" value="1" <if condition="$node['status']">checked="checked"</if>/> 启用
+            <input type="radio" name="status" value="0" <if condition="!$node['status']">checked="checked"</if>/> 禁用
+        </td>
+    </tr>
+    <tr>
+        <td class="tableleft"></td>
+        <td>
+        <input type="hidden" name="id" value="{$id}" />
+        <input type="hidden" name="pid" value="{$pid}" />
+        <input type="hidden" name="level" value="{$level}" />
+        <button type="submit" class="btn btn-primary" type="button">保存</button>&nbsp;&nbsp;<button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+        </td>
+    </tr>
+</table>
+</form>
+</body>
+</html>
+<script>
+    $(function () {       
+		$('#backid').click(function(){
+				window.location.href="{:U('Admin/Rbac/node')}";
+		 });
+
+    });
+    $(document).ready(function(){
+    $("#editNode").submit(function(){
+                var options = {
+                    target : '#output1',
+                    dataType : 'json',
+                    success:function(data){
+                        if(data){
+                            var d = dialog({
+                                content: '恭喜，保存成功咯;-)'
+                            });
+                            d.show();
+                            setTimeout(function () {
+                                d.close().remove();
+                            }, 2000);
+                            parent.location.reload();
+                        }
+                        else {
+                            var d = dialog({
+                                content: '哎呀，保存失败啦-_-!'
+                            });
+                            d.show();
+                            setTimeout(function () {
+                                d.close().remove();
+                            }, 2000);
+                        }
+                    }
+                }
+                $(this).ajaxSubmit(options);  
+               return false; //阻止表单默认提交  
+            });
+});
+</script>

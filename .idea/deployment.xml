@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="spmad">
+    <serverData>
+      <paths name="spmad">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/spmdmaster" local="$PROJECT_DIR$" web="/spmdmaster" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>

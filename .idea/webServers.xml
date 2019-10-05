@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="e135734f-a1e6-4d28-98db-c2011a63b469" name="spmad" url="http://localhost">
+        <fileTransfer port="0" mountedRoot="D:\phpstudy\PHPTutorial\WWW" accessType="MOUNT" />
+      </webServer>
+    </option>
+  </component>
+</project>

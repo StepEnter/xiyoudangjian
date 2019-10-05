@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>任务流程</title>
+    <meta charset="UTF-8">
+  
+   <link href="__PUBLIC__/bui-bootstrap/assets/css/bs3/dpl-min.css" rel="stylesheet" type="text/css" />
+   <link href="__PUBLIC__/bui-bootstrap/assets/css/bs3/bui-min.css" rel="stylesheet" type="text/css" />
+    <!-- <link rel="stylesheet" type="text/css" href="__PUBLIC__/bui-bootstrap/Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/bui-bootstrap/Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="__PUBLIC__/bui-bootstrap/Css/style.css" /> -->
+    <script src="__PUBLIC__/bui-bootstrap/assets/js/jquery-1.8.1.min.js"></script>
+    <script src="__PUBLIC__/bui-bootstrap/assets/js/bui-min.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/bui-bootstrap/Js/bootstrap.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/bui-bootstrap/Js/ckform.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/bui-bootstrap/Js/common.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/lib/jquery.form.js"></script>
+    <!--弹出对话框-->
+    <link rel="stylesheet" href="__PUBLIC__/artDialog/css/ui-dialog.css">
+    <script src="__PUBLIC__/artDialog/dist/dialog-plus.js"></script>
+
+    <!-- 引入ueditor -->
+       <script type="text/javascript">
+        window.UEDITOR_HOME_URL = '__ROOT__/Data/ueditor/';
+        var content = '{$edit.content}';
+
+        window.onload = function(){
+            window.UEDITOR_CONFIG.initialFrameWidth = 800;
+            window.UEDITOR_CONFIG.initialFrameHeight = 200;
+            //window.UEDITOR_CONFIG.initialFrameHeight
+
+
+            var ue = UE.getEditor('content');
+            ue.ready(function() {
+            //设置编辑器的内容
+            //ue.setContent(content);
+            //获取html内容，返回: <p>hello</p>
+            var html = ue.getContent();
+            //获取纯文本内容，返回: hello
+            //var txt = ue.getContentTxt();
+            /* 2.传入参数表,添加到已有参数表里 */
+            ue.execCommand('serverparam', {
+                'userurl': '__ROOT__/Data/uploads/'+'{$_SESSION["uid"]}'
+            });
+        });
+        }
+
+       </script>
+    <js file="__ROOT__/Data/ueditor/ueditor.config.js"/>
+    <js file="__ROOT__/Data/ueditor/ueditor.all.min.js"/>
+    <style type="text/css">
+        body {
+            margin:0 0;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+        .navbox{
+      width: 200px;
+      height: auto;
+      position: fixed;
+      left:10px; 
+      top: 10px;
+      background-color: #D3D3D3;
+    }
+    .statusbox{
+      margin-top:20px;
+      width: 200px;
+      height: auto;
+      
+      background-color: #D3D3D3;
+
+    }
+
+
+    </style>
+</head>
+<body>
+ <div class="navbox">
+      <div class="taskbox">
+        <h3>党员发展流程</h3>
+        <foreach name='showTask' item='t1'>
+        <strong>{$t1.title}</strong>&nbsp;&nbsp;
+        <a href="#" class="edit" taskid="{$t1.id}">修改</a>&nbsp;&nbsp;<a href="#" class="del" taskid="{$t1.id}">删除</a><br/>
+        <foreach name="t1['child']" item="t2">
+        ┗{$t2.title}
+        <a href="#" class="edit" taskid="{$t2.id}">修改</a>&nbsp;&nbsp;<a href="#" class="del" taskid="{$t2.id}">删除</a><br/>
+        </foreach>
+      </foreach>
+      <button id="addtaskbtn" name="addtask">添加</button>
+    </div>
+    <div class="statusbox">
+    <h3>阶段信息</h3>
+    <foreach name='status' item='t1'>
+     {$t1.id}. {$t1['name']}&nbsp;&nbsp;<a href="#" class="editstatus" statusid="{$t1.id}">修改</a>&nbsp;&nbsp;<a href="#" class="delstatus" statusid="{$t1.id}">删除</a><br/>
+    </foreach>
+  <button id="addstatusbtn" name="addstatus">添加</button>
+</div>
+</div>
+
+<div id="form" style="margin-left:250px;display:none;">
+<div class="page-header" style="width:800px;margin:0 auto;">
+  <h1 style="font-size:36px;"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <span class="title">添加流程</span> <small style="float:right;"> 党员发展评估系统</small></h1>
+</div>
+
+<form id="addActivity" action="{:U('Admin/Rbac/taskHandle')}" method="post" class="definewidth m20" enctype="multipart/form-data">
+    <table class="table table-bordered table-hover definewidth m10">
+        <tr>
+            <input type="hidden" name="id" value="{$edit.id}" />
+            <td width="10%" class="tableleft">名称</td>
+            <td><input type="text" class="form-control" style="width:200px;" name="title" value="{$edit.title}"/></td>
+        </tr>
+         <tr>
+            <td width="10%" class="tableleft">父流程</td>
+            <td>
+                <select id="select" name="task">
+                 <option  value="0" checked="checked">新父级流程</option>
+                 <foreach name='showTask' item='t1'>
+                  <option id="taskoption{$t1['id']}" value="{$t1['id']}">{$t1.title}</option>
+                </foreach>
+                </select>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                 任务所属阶段：<select id="selectstatus" style="display:none" name="task_status">
+                 <foreach name='status' item='t1'>
+                  <option id="statusoption{$t1['id']}" value="{$t1['id']}">{$t1.name}</option>
+                </foreach>
+                </select>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                完成场合:&nbsp;&nbsp;&nbsp;&nbsp;
+           
+                 线上：<input id="radio1" type="radio" name="is_ok"  value="1">
+                 线下：<input id="radio2" type="radio" name="is_ok" value="0">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                 序号:<input type="text" style="width:8px;" name="order"/>
+            </td>
+            
+           
+        </tr>
+        
+           
+        
+        <tr>
+            <td width="10%" height="50px;" class="tableleft">内容</td>
+            <td> <script id="content" type="text/plain"></script></td>
+        </tr>
+        
+       
+        <tr>
+            <td class="tableleft"></td>
+            <td>
+                <button type="submit" class="button button-primary" type="button">保存</button> 
+            </td>
+        </tr>
+    </table>
+</form>
+</div>
+<div id="status" style="margin-left:250px;width:800px;display:none;">
+    <div class="page-header" >
+    <h1 style="font-size:36px;"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <span class="statustitle">添加阶段信息</span> <small style="float:right;"> 党员发展评估系统</small></h1>
+    </div>
+    <form id="addstatus" action="{:U('Admin/Rbac/statusHandle')}" method="post" class="definewidth m20">
+    <table class="table table-bordered table-hover definewidth m10">
+    <tr>
+    <td><font color=red>*</font>序号</td>
+    <td><input type="text" name="status_id"/>&nbsp;&nbsp;&nbsp;&nbsp;序号为数字且不能重复，根据状态的先后次序从小到大顺序排列</td>
+    </tr>
+    <tr>
+    <td><font color=red>*</font>标题</td>
+    <td><input type="text" name="name"/></td>
+    </tr>
+    <tr>
+    <td><font color=red>*</font>提示信息</td>
+    <td><textarea name="statusinfo"></textarea></td>
+    </tr>
+    <tr>
+        <td class="tableleft"></td>
+        <td>
+            <button type="submit" class="button button-primary" type="button">保存</button> 
+        </td>
+        </tr>
+    </table>
+    </form>
+</div>
+<center><h1>点击左边相关按钮或链接选择操作</h1></center>
+<script>
+    //引入日历控件
+    var Calendar = BUI.Calendar
+    var datepicker = new Calendar.DatePicker({
+    trigger:'.calendar',
+    autoRender : true
+    });
+</script>
+<script>
+    $(document).ready(function(){
+      var selectv = $("select").val();
+        if(selectv == '0') {
+          $("#selectstatus").css("display","inline");
+        }else{
+          $("#selectstatus").css("display","none");
+        }
+        $("#select").change(function(){
+          if($(this).val() == '0') {
+          $("#selectstatus").css("display","inline");
+        }else{
+          $("#selectstatus").css("display","none");
+        }
+        });
+      //添加流程内容
+      $("#addtaskbtn").click(function(){
+        $("#status").css("display","none");
+        $(".title").text("添加流程");
+        $("[name='title']").val("");
+        $("[name='id']").val("");
+        $("[name='order']").val("");
+        //改变选择框
+              var kk = document.getElementById("select").options;  
+              for (var i=0; i<kk.length; i++) {  
+               kk[i].selected=false;  }
+               $("#radio1").attr("checked",true);
+               //$("#radio2").attr("checked",false);
+
+        //流程编辑器重置
+        UE.getEditor('content').execCommand('cleardoc');
+
+        //alert($("#form").css("display"));
+        var display = $("#form").css("display");
+        if(display=='none')
+        $("#form").css("display","block");
+        if(display=='block')
+        $("#form").css("display","none");
+      });
+      
+      //修改流程内容
+      $(".edit").click(function(){
+        $("#status").css("display","none");
+        task_id = $(this).attr("taskid");
+        $.ajax({
+             type: 'POST',
+             url: '{:U("Admin/Rbac/editTask")}' ,
+             data: {task_id:task_id} ,
+             dataType: 'json',
+             success:function(data){
+              editData = data;
+              $(".title").text("修改流程");
+              $("[name='title']").val(editData.title);
+              $("[name='id']").val(editData.id);
+              $("[name='order']").val(editData.task_order);
+              if(editData.task_type == -1) $("#radio2").attr("checked","checked");
+              else $("#radio1").attr("checked","checked");
+              //改变选择框
+              var kk = document.getElementById("select").options;  
+              for (var i=0; i<kk.length; i++) {  
+              if (kk[i].value==editData.fid) {  
+               kk[i].selected=true;  }}
+
+               var ue = UE.getEditor('content');
+                  ue.ready(function() {
+                  ue.setContent(editData.content);
+              });
+              if($("#select").val()=='0'){
+                $("#selectstatus").css("display","inline");
+                var ss = document.getElementById("selectstatus").options;  
+                for (var j=0; j<kk.length; j++) {  
+                      if (ss[j].value==editData.status) {  
+                       ss[j].selected=true;  }
+                     }
+              }
+              else
+                $("#selectstatus").css("display","none");
+              $("#form").css("display","block");
+
+             }
+        });
+      });
+      //流程表单ajax提交
+        $("#addActivity").submit(function(){
+                var options = {
+                    target : '#output1',
+                    dataType : 'json',
+                    beforeSubmit : function(){
+                        if(!$("[name='title']").val()){
+                        alert("标题是必填的，你没有填哦！")
+                         return false;
+                     }
+                    },
+                    success:function(data){
+                        if(data){
+                            var d = dialog({
+                                content: '恭喜，保存成功咯;-)'
+                            });
+                            d.show();
+                            setTimeout(function () {
+                                d.close().remove();
+                                //parent.$.fancybox.close();
+                                //关闭浏览器窗口
+                                $("#form").css("display","none");
+                                if(!$("[name='id']").val()) 
+                                  location.reload();
+                    
+                                    
+                            }, 2000);
+                            
+                        }
+                        else {
+                            var d = dialog({
+                                content: '哎呀，添加失败啦-_-!'
+                            });
+                            d.show();
+                            setTimeout(function () {
+                                d.close().remove();
+                            }, 2000);
+                        }
+                    }
+                }
+                $(this).ajaxSubmit(options);  
+               return false; //阻止表单默认提交  
+            });
+   //删除流程信息
+   $(".del").click(function(){
+     var task_id = $(this).attr("taskid");
+         var d = dialog({
+              title: '提示',
+              content: '确定要删除？？',
+              okValue: '确定',
+              ok: function () {
+                 $.ajax({
+             type: 'POST',
+             url: '{:U("Admin/Rbac/deltask")}' ,
+             data: {task_id:task_id} ,
+             dataType: 'json',
+             success:function(data){
+               if(data){
+                            var d = dialog({
+                                content: '恭喜，删除成功咯;-)'
+                            });
+                            d.show();
+                            setTimeout(function () {
+                                d.close().remove();
+                                location.reload();
+                                
+                            }, 2000);
+                            
+                        }
+                        else {
+                            var d = dialog({
+                                content: '哎呀，删除失败啦-_-!'
+                            });
+                            d.show();
+                            setTimeout(function () {
+                                d.close().remove();
+                            }, 2000);
+                        }
+
+             }
+        });
+          return;
+              },
+              cancelValue: '取消',
+              cancel: function () {}
+          });
+        d.show();
+
+      
+   });
+//-----阶段信息表单
+//添加阶段内容
+      $("#addstatusbtn").click(function(){
+        $("#form").css("display","none");
+        $(".statustitle").text("添加阶段信息");
+        $("[name='status_id']").val("");
+        $("[name='name']").val("");
+        $("[name='statusinfo']").val("");
+        //alert($("#form").css("display"));
+        var display = $("#status").css("display");
+        if(display=='none')
+        $("#status").css("display","block");
+        if(display=='block')
+        $("#status").css("display","none");
+      });
+       //修改阶段内容
+      $(".editstatus").click(function(){
+        $("#form").css("display","none");
+        status_id = $(this).attr("statusid");
+        $.ajax({
+             type: 'POST',
+             url: '{:U("Admin/Rbac/editstatus")}' ,
+             data: {status_id:status_id} ,
+             dataType: 'json',
+             success:function(data){
+              editData = data;
+              $(".statustitle").text("修改阶段信息");
+              $("[name='name']").val(editData.name);
+              $("[name='status_id']").val(editData.id);
+              $("[name='statusinfo']").val(editData.content);
+              $("#status").css("display","block");
+
+             }
+        });
+      });
+          //阶段表单ajax提交
+        $("#addstatus").submit(function(){
+                var options = {
+                    target : '#output1',
+                    dataType : 'json',
+                    beforeSubmit : function(){
+                        if(!$("[name='name']").val()){
+                        alert("标题是必填的，你没有填哦！")
+                         return false;
+                     }
+                     if(!$("[name='status_id']").val()){
+                        alert("序号是必填的，你没有填哦！")
+                         return false;
+                     }
+                    },
+                    success:function(data){
+                        if(data){
+                            var d = dialog({
+                                content: '恭喜，保存成功咯;-)'
+                            });
+                            d.show();
+                            setTimeout(function () {
+                                d.close().remove();
+                                //parent.$.fancybox.close();
+                                //关闭浏览器窗口
+                                $("#form").css("display","none");
+                                  location.reload();
+                    
+                                    
+                            }, 2000);
+                            
+                        }
+                        else {
+                            var d = dialog({
+                                content: '哎呀，保存失败啦-_-!'
+                            });
+                            d.show();
+                            setTimeout(function () {
+                                d.close().remove();
+                            }, 2000);
+                        }
+                    }
+                }
+                $(this).ajaxSubmit(options);  
+               return false; //阻止表单默认提交  
+            });
+ //删除流程信息
+   $(".delstatus").click(function(){
+     var status_id = $(this).attr("statusid");
+         var d = dialog({
+              title: '提示',
+              content: '确定要删除？？',
+              okValue: '确定',
+              ok: function () {
+                 $.ajax({
+             type: 'POST',
+             url: '{:U("Admin/Rbac/delstatus")}' ,
+             data: {status_id:status_id} ,
+             dataType: 'json',
+             success:function(data){
+               if(data){
+                            var d = dialog({
+                                content: '恭喜，删除成功咯;-)'
+                            });
+                            d.show();
+                            setTimeout(function () {
+                                d.close().remove();
+                                location.reload();
+                                
+                            }, 2000);
+                            
+                        }
+                        else {
+                            var d = dialog({
+                                content: '哎呀，删除失败啦-_-!'
+                            });
+                            d.show();
+                            setTimeout(function () {
+                                d.close().remove();
+                            }, 2000);
+                        }
+
+             }
+        });
+          return;
+              },
+              cancelValue: '取消',
+              cancel: function () {}
+          });
+        d.show();
+
+      
+   });
+
+});
+
+</script>
+</body>
+</html>
